@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Launchpad — The Kimberley School</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f0f4fa;--surface:#fff;--surface2:#e8eef8;--border:#c8d6ec;--navy:#0d2a6e;--blue:#1a56c4;--blue-lt:#3b7de8;--green:#1a9e5c;--amber:#d4820a;--red:#c0392b;--text:#0f1d3a;--muted:#4a5f88;--dim:#8a9bbf;--r:12px;--rs:8px;--sh:0 2px 12px rgba(13,42,110,.10);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%;}
+#app{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+#sidebar{width:225px;min-width:225px;background:var(--navy);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sb-logo{padding:20px 16px 14px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;gap:8px;}
+.sb-crest{width:60px;height:60px;object-fit:contain;}
+.sb-crest-fallback{width:56px;height:56px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-weight:700;font-size:18px;color:#fff;letter-spacing:1px;}
+.sb-wordmark{width:110px;height:auto;object-fit:contain;filter:brightness(10);}
+.sb-appname{font-family:"Syne",sans-serif;font-weight:800;font-size:16px;color:rgba(255,255,255,.9);letter-spacing:.3px;}
+.nav-lbl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:14px 18px 4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 18px;cursor:pointer;color:rgba(255,255,255,.6);font-size:14px;font-weight:500;border-left:3px solid transparent;transition:all .15s;-webkit-user-select:none;user-select:none;}
+.nav-item:hover,.nav-item:active{color:#fff;background:rgba(255,255,255,.07);}
+.nav-item.active{color:#fff;background:rgba(255,255,255,.12);border-left-color:#5b9cf6;}
+.sb-foot{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.1);}
+.sb-save{width:100%;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:var(--rs);padding:10px;font-family:"DM Sans",sans-serif;font-weight:600;font-size:13px;cursor:pointer;margin-bottom:7px;transition:background .15s;-webkit-appearance:none;}
+.sb-save:hover{background:rgba(255,255,255,.25);}
+.sb-load{display:block;width:100%;text-align:center;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.15);border-radius:var(--rs);padding:8px;font-size:12px;cursor:pointer;transition:all .15s;}
+.sb-load:hover{color:rgba(255,255,255,.8);}
+
+/* MOBILE NAV */
+#mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navy);z-index:50;border-top:1px solid rgba(255,255,255,.15);padding:0;safe-area-inset-bottom:env(safe-area-inset-bottom);}
+.mob-nav-inner{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.mob-nav-inner::-webkit-scrollbar{display:none;}
+.mob-nav-item{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 14px 12px;cursor:pointer;color:rgba(255,255,255,.5);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-top:2px solid transparent;transition:all .15s;white-space:nowrap;}
+.mob-nav-item.active,.mob-nav-item:active{color:#fff;border-top-color:#5b9cf6;}
+.mob-nav-item .mni{font-size:18px;line-height:1;}
+.mob-nav-wrap{position:relative;}
+.mob-nav-fade{position:absolute;right:0;top:0;bottom:0;width:52px;background:linear-gradient(to right,rgba(13,42,110,0) 0%,rgba(13,42,110,.96) 100%);pointer-events:none;transition:opacity .3s;z-index:2;}
+.mob-nav-chevron{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.85);font-size:20px;pointer-events:none;transition:opacity .3s;z-index:3;line-height:1;font-weight:300;}
+
+/* MAIN */
+#main{flex:1;padding:28px 32px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.page{display:none;max-width:860px;animation:fi .2s ease;}
+.page.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.ph{margin-bottom:22px;}
+.pt{font-family:"Syne",sans-serif;font-weight:800;font-size:24px;color:var(--navy);margin-bottom:3px;letter-spacing:-.3px;}
+.ps{color:var(--muted);font-size:14px;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px;box-shadow:var(--sh);}
+.ct{font-family:"Syne",sans-serif;font-weight:700;font-size:14px;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+
+/* FORMS */
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:5px;font-weight:500;}
+input[type=text],input[type=date],input[type=number],select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:"DM Sans",sans-serif;font-size:16px;padding:10px 12px;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234a5f88' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff;}
+textarea{resize:vertical;min-height:78px;font-size:15px;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.fg{margin-bottom:12px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 18px;border-radius:var(--rs);font-family:"DM Sans",sans-serif;font-weight:600;font-size:14px;cursor:pointer;border:none;transition:all .15s;-webkit-appearance:none;touch-action:manipulation;}
+.btn-p{background:var(--blue);color:#fff;}
+.btn-p:hover,.btn-p:active{background:var(--blue-lt);}
+.btn-s{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.btn-s:hover,.btn-s:active{border-color:var(--blue);color:var(--blue);}
+
+/* PROGRESS */
+.pw{margin-bottom:12px;}
+.pl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px;}
+.pb{height:9px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--border);}
+.pf{height:100%;border-radius:99px;transition:width .7s ease;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 10px;text-align:center;box-shadow:var(--sh);}
+.sn{font-family:"Syne",sans-serif;font-weight:800;font-size:28px;line-height:1;margin-bottom:3px;}
+.sl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;}
+
+/* TAGS */
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600;}
+.t-sport{background:rgba(230,160,32,.12);color:#a06010;}
+.t-arts{background:rgba(180,60,180,.10);color:#7a30a0;}
+.t-academic{background:rgba(26,86,196,.12);color:var(--blue);}
+.t-community{background:rgba(26,158,92,.12);color:#187a48;}
+.t-work{background:rgba(200,100,20,.12);color:#a05010;}
+.t-careers{background:rgba(26,158,92,.12);color:#187a48;}
+.t-other{background:rgba(100,120,160,.12);color:#506080;}
+.t-skill{background:rgba(26,86,196,.08);color:var(--blue);border:1px solid rgba(26,86,196,.2);}
+
+/* ACHIEVEMENTS */
+.ai{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:13px 14px;margin-bottom:9px;display:flex;gap:11px;align-items:flex-start;transition:border-color .15s;}
+.ai:hover{border-color:var(--blue);}
+.ai.done{opacity:.55;}
+.ai.done .at{text-decoration:line-through;}
+.ck{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .15s;font-size:13px;color:#fff;touch-action:manipulation;}
+.ck:hover,.ck:active{border-color:var(--green);}
+.ck.chk{background:var(--green);border-color:var(--green);}
+.ab{flex:1;min-width:0;}
+.at{font-weight:600;font-size:14px;margin-bottom:2px;}
+.ad{font-size:13px;color:var(--muted);margin-top:3px;}
+.am{font-size:12px;color:var(--muted);display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:7px;}
+.adel{color:var(--dim);cursor:pointer;font-size:20px;padding:2px 6px;flex-shrink:0;touch-action:manipulation;}
+.adel:hover,.adel:active{color:var(--red);}
+
+/* SKILL CHIPS */
+.sg{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.chip{padding:6px 13px;border-radius:99px;font-size:13px;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all .15s;color:var(--muted);background:var(--surface2);touch-action:manipulation;}
+.chip.sel{background:rgba(26,86,196,.12);border-color:var(--blue);color:var(--blue);}
+
+/* ACCORDION */
+details{margin-bottom:14px;}
+details>summary{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;font-family:"Syne",sans-serif;font-weight:700;font-size:14px;color:var(--navy);list-style:none;box-shadow:var(--sh);display:flex;align-items:center;gap:8px;-webkit-user-select:none;user-select:none;transition:background .15s;}
+details>summary::-webkit-details-marker{display:none;}
+details>summary::after{content:"▸";margin-left:auto;color:var(--dim);transition:transform .2s;}
+details[open]>summary::after{transform:rotate(90deg);}
+details[open]>summary{border-radius:var(--r) var(--r) 0 0;border-bottom:none;background:var(--surface2);}
+.det-body{background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r) var(--r);padding:16px;}
+
+/* TIERS */
+.tier{border-radius:var(--rs);padding:12px 14px;margin-bottom:9px;border-left:4px solid;display:flex;align-items:flex-start;gap:11px;}
+.tier-a{background:rgba(26,158,92,.07);border-color:var(--green);}
+.tier-b{background:rgba(212,130,10,.07);border-color:var(--amber);}
+.tier-c{background:rgba(26,86,196,.07);border-color:var(--blue);}
+.tier-d{background:rgba(13,42,110,.07);border-color:var(--navy);}
+.ticon{font-size:18px;flex-shrink:0;margin-top:2px;}
+.ttitle{font-family:"Syne",sans-serif;font-weight:700;font-size:13px;margin-bottom:3px;}
+.tdesc{font-size:13px;color:var(--muted);line-height:1.5;}
+
+/* PATHWAY CARDS */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.pc{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:15px;cursor:pointer;transition:all .15s;text-decoration:none;display:block;}
+.pc:hover,.pc:active{border-color:var(--blue);transform:translateY(-2px);box-shadow:var(--sh);}
+.picon{font-size:24px;margin-bottom:7px;}
+.ptitle{font-family:"Syne",sans-serif;font-weight:700;font-size:13px;margin-bottom:3px;color:var(--navy);}
+.pdesc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+/* SUBJECTS */
+.subj-hdr{display:grid;grid-template-columns:1fr 140px 150px 30px;gap:8px;padding:0 0 7px;border-bottom:2px solid var(--border);margin-bottom:2px;}
+.subj-hdr span{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);}
+.subj-row{display:grid;grid-template-columns:1fr 140px 150px 30px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);}
+.subj-row:last-child{border-bottom:none;}
+.subj-name{font-size:14px;font-weight:500;}
+.subj-del{cursor:pointer;color:var(--dim);text-align:center;font-size:20px;touch-action:manipulation;}
+.subj-del:hover,.subj-del:active{color:var(--red);}
+
+/* CAREER RESULT */
+.career-result{background:linear-gradient(135deg,rgba(26,86,196,.06),rgba(13,42,110,.04));border:2px solid var(--blue);border-radius:var(--r);padding:18px;margin-top:14px;display:none;}
+.career-result.show{display:block;animation:fi .3s ease;}
+.cr-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.cr-icon{font-size:34px;}
+.cr-title{font-family:"Syne",sans-serif;font-weight:800;font-size:17px;color:var(--navy);}
+.cr-row{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}
+.cr-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);min-width:100px;padding-top:2px;flex-shrink:0;}
+.cr-val{font-size:14px;color:var(--text);line-height:1.5;flex:1;}
+.cr-detail{background:var(--navy);color:#fff;border-radius:var(--rs);padding:12px 15px;margin-top:10px;font-size:13px;line-height:1.6;}
+
+/* ROUTE ALERTS */
+.ra{background:rgba(13,42,110,.04);border:1px solid rgba(13,42,110,.15);border-radius:var(--rs);padding:12px 15px;margin-bottom:9px;}
+.rat{font-weight:700;font-size:13px;color:var(--navy);margin-bottom:4px;}
+.rad{font-size:13px;color:var(--muted);line-height:1.5;}
+
+/* TIMELINE */
+.tl-wrap{position:relative;padding-left:24px;}
+.tl-line{position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--border);}
+.tl-item{position:relative;margin-bottom:14px;}
+.tl-dot{position:absolute;left:-24px;top:6px;width:14px;height:14px;border-radius:50%;border:2px solid var(--blue);background:var(--surface);z-index:1;}
+.tl-dot.past{background:var(--dim);border-color:var(--dim);}
+.tl-dot.now{background:var(--blue);border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,196,.2);}
+.tl-dot.soon{background:var(--amber);border-color:var(--amber);}
+.tl-content{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 13px;}
+.tl-content.now-item{border-color:var(--blue);background:rgba(26,86,196,.05);}
+.tl-title{font-weight:600;font-size:14px;}
+.tl-meta{font-size:12px;color:var(--muted);margin-top:3px;}
+.tl-del{float:right;cursor:pointer;color:var(--dim);font-size:18px;margin-top:-1px;touch-action:manipulation;}
+.tl-del:hover,.tl-del:active{color:var(--red);}
+
+/* PRIVATE GOALS */
+#goals-text{width:100%;min-height:120px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:12px;font-family:"DM Sans",sans-serif;font-size:15px;color:var(--text);resize:vertical;outline:none;line-height:1.7;}
+#goals-text:focus{border-color:var(--blue);background:#fff;}
+
+/* MICRO MOMENTS */
+.moment-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 13px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.moment-item.done .moment-text{text-decoration:line-through;opacity:.55;}
+.moment-ck{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;font-size:12px;color:#fff;touch-action:manipulation;}
+.moment-ck:hover,.moment-ck:active{border-color:var(--green);}
+.moment-ck.chk{background:var(--green);border-color:var(--green);}
+.moment-text{flex:1;font-size:14px;}
+.moment-date{font-size:11px;color:var(--dim);flex-shrink:0;}
+.moment-del{color:var(--dim);cursor:pointer;font-size:18px;padding:0 4px;flex-shrink:0;touch-action:manipulation;}
+.moment-del:hover,.moment-del:active{color:var(--red);}
+
+/* MENTAL HEALTH */
+.mh-card{background:linear-gradient(135deg,rgba(26,158,92,.06),rgba(26,86,196,.04));border:1px solid rgba(26,158,92,.25);border-radius:var(--r);padding:16px;margin-bottom:14px;}
+.mh-title{font-family:"Syne",sans-serif;font-weight:700;font-size:15px;color:var(--green);margin-bottom:8px;}
+.mh-links{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.mh-link{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-decoration:none;display:block;transition:all .15s;}
+.mh-link:hover,.mh-link:active{border-color:var(--green);}
+.mh-link-name{font-weight:700;font-size:13px;color:var(--navy);margin-bottom:2px;}
+.mh-link-desc{font-size:12px;color:var(--muted);line-height:1.4;}
+
+/* STATEMENT */
+#stmt-out{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:15px;font-size:14px;line-height:1.8;color:var(--text);min-height:110px;white-space:pre-wrap;}
+
+/* WELCOME */
+#welcome{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;overflow-y:auto;}
+.wb{background:#fff;border-radius:20px;padding:36px 32px;max-width:440px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);margin:auto;}
+.w-crest{width:70px;height:auto;margin:0 auto 8px;display:block;}
+.w-wordmark{width:130px;height:auto;margin:0 auto 6px;display:block;}
+.w-crest-fallback{width:72px;height:72px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-family:Georgia,serif;font-weight:700;font-size:24px;color:#fff;letter-spacing:1px;}
+.w-app{font-family:"Syne",sans-serif;font-weight:800;font-size:28px;color:var(--blue);margin-bottom:3px;}
+.w-tag{color:var(--muted);font-size:14px;margin-bottom:22px;}
+.wf{text-align:left;margin-bottom:12px;}
+.w-btn{width:100%;background:var(--blue);color:#fff;border:none;border-radius:var(--rs);padding:14px;font-family:"DM Sans",sans-serif;font-weight:700;font-size:16px;cursor:pointer;margin-bottom:12px;transition:background .15s;-webkit-appearance:none;touch-action:manipulation;}
+.w-btn:hover,.w-btn:active{background:var(--blue-lt);}
+.w-or{color:var(--dim);font-size:12px;margin:6px 0 10px;}
+
+/* MISC */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.empty{text-align:center;color:var(--dim);padding:28px 16px;font-size:14px;}
+.ei{font-size:30px;margin-bottom:8px;}
+.copy-btn{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:var(--rs);padding:7px 13px;font-size:13px;cursor:pointer;font-family:"DM Sans",sans-serif;transition:all .15s;touch-action:manipulation;}
+.copy-btn:hover,.copy-btn:active{border-color:var(--blue);color:var(--blue);}
+#toast{position:fixed;bottom:80px;right:16px;background:var(--navy);color:#fff;padding:11px 18px;border-radius:var(--rs);font-weight:600;font-size:13px;opacity:0;transform:translateY(6px);transition:all .25s;z-index:999;pointer-events:none;box-shadow:0 4px 20px rgba(13,42,110,.3);max-width:280px;}
+#toast.show{opacity:1;transform:translateY(0);}
+.confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;animation:fall 1.2s ease-in forwards;pointer-events:none;z-index:9999;}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+
+/* DESKTOP: hide mobile nav */
+@media(min-width:701px){
+  #mobile-nav{display:none;}
+  #main{padding:28px 36px;}
+}
+/* MOBILE */
+@media(max-width:700px){
+  #sidebar{display:none;}
+  #mobile-nav{display:block;}
+  #app{flex-direction:column;}
+  #main{flex:1;padding:16px 14px 90px;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .pgrid{grid-template-columns:1fr;}
+  .fr{grid-template-columns:1fr;}
+  .subj-row,.subj-hdr{grid-template-columns:1fr 32px;}
+  .subj-hdr span:nth-child(2),.subj-hdr span:nth-child(3),.subj-row>div:nth-child(2),.subj-row>div:nth-child(3){display:none;}
+  .mh-links{grid-template-columns:1fr;}
+  .cr-row{flex-direction:column;gap:2px;}
+  .cr-lbl{min-width:unset;}
+  #toast{bottom:90px;right:10px;left:10px;text-align:center;}
+  .pt{font-size:22px;}
+  .pgrid{gap:10px;}
+  .pc{padding:13px;}
+}
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="welcome">
+  <div class="wb">
+    <img class="w-crest" src="ks_crest.png" alt="The Kimberley School" onerror="this.style.display='none';document.getElementById('w-fb').style.display='flex'">
+    <div class="w-crest-fallback" id="w-fb" style="display:none">KS</div>
+    <img class="w-wordmark" src="ks_wordmark.png" alt="The Kimberley School" onerror="this.style.display='none'">
+    <div class="w-app">Launchpad</div>
+    <div class="w-tag">Your achievements. Your goals. Your future.</div>
+    <div class="wf"><label>Your first name</label><input type="text" id="w-name" placeholder="e.g. Jamie" maxlength="30" autocomplete="given-name"></div>
+    <div class="wf"><label>Your year group</label>
+      <select id="w-year">
+        <option value="">Select year group</option>
+        <option>Year 7</option><option>Year 8</option><option>Year 9</option>
+        <option>Year 10</option><option>Year 11</option><option>Year 12</option><option>Year 13</option>
+      </select>
+    </div>
+    <button class="w-btn" onclick="startApp()">Let's go &rarr;</button>
+    <div class="w-or">&mdash; or load a previous save &mdash;</div>
+    <label for="load-w" style="display:block;border:1px solid var(--border);border-radius:8px;padding:11px;font-size:14px;cursor:pointer;color:var(--muted);text-align:center;">&#128194; Load saved data</label>
+    <input type="file" id="load-w" accept=".json" style="display:none" onchange="loadFile(this,true)">
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <!-- DESKTOP SIDEBAR -->
+  <div id="sidebar">
+    <div class="sb-logo">
+      <img class="sb-crest" src="ks_crest.png" alt="KS" onerror="this.style.display='none';document.getElementById('sb-fb').style.display='flex'">
+      <div class="sb-crest-fallback" id="sb-fb" style="display:none">KS</div>
+      <img class="sb-wordmark" src="ks_wordmark.png" alt="The Kimberley School" onerror="this.style.display='none'">
+      <div class="sb-appname">Launchpad</div>
+    </div>
+    <div class="nav-lbl">Menu</div>
+    <div class="nav-item active" onclick="nav('dashboard')"    id="n-dashboard">    &#127968; Dashboard</div>
+    <div class="nav-item"        onclick="nav('moments')"      id="n-moments">      &#127881; My Wins</div>
+    <div class="nav-item"        onclick="nav('goals')"        id="n-goals">        &#127919; My Goals</div>
+    <div class="nav-item"        onclick="nav('achievements')" id="n-achievements"> &#11088; Achievements</div>
+    <div class="nav-item"        onclick="nav('dofe')"         id="n-dofe">         &#127956; Duke of Edinburgh</div>
+    <div class="nav-item"        onclick="nav('academic')"     id="n-academic">     &#128218; My Subjects</div>
+    <div class="nav-item"        onclick="nav('careers')"      id="n-careers">      &#128269; Career Explorer</div>
+    <div class="nav-item"        onclick="nav('timeline')"     id="n-timeline">     &#128336; My Timeline</div>
+    <div class="nav-item"        onclick="nav('pathways')"     id="n-pathways">     &#129517; Pathways</div>
+    <div class="nav-item"        onclick="nav('statement')"    id="n-statement">    &#9997;&#65039; Statement</div>
+    <div class="nav-item"        onclick="nav('wellbeing')"    id="n-wellbeing">    &#128149; Wellbeing</div>
+        <div class="sb-foot">
+      <button class="sb-save" onclick="saveFile()">&#128190; Save my data</button>
+      <label for="load-m" class="sb-load">&#128194; Load saved data</label>
+      <input type="file" id="load-m" accept=".json" style="display:none" onchange="loadFile(this,false)">
+    </div>
+  </div>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <div id="mobile-nav">
+    <div class="mob-nav-wrap">
+      <div class="mob-nav-fade" id="mob-fade"></div>
+      <div class="mob-nav-chevron" id="mob-chevron">&#8250;</div>
+      <div class="mob-nav-inner" id="mob-inner">
+        <div class="mob-nav-item active" onclick="nav('dashboard')"    id="mn-dashboard">    <div class="mni">&#127968;</div>Home</div>
+        <div class="mob-nav-item"        onclick="nav('moments')"      id="mn-moments">      <div class="mni">&#127881;</div>Wins</div>
+        <div class="mob-nav-item"        onclick="nav('goals')"        id="mn-goals">        <div class="mni">&#127919;</div>Goals</div>
+        <div class="mob-nav-item"        onclick="nav('achievements')" id="mn-achievements"> <div class="mni">&#11088;</div>Achieve</div>
+        <div class="mob-nav-item"        onclick="nav('dofe')"         id="mn-dofe">         <div class="mni">&#127956;</div>DofE</div>
+        <div class="mob-nav-item"        onclick="nav('academic')"     id="mn-academic">     <div class="mni">&#128218;</div>Subjects</div>
+        <div class="mob-nav-item"        onclick="nav('careers')"      id="mn-careers">      <div class="mni">&#128269;</div>Careers</div>
+        <div class="mob-nav-item"        onclick="nav('timeline')"     id="mn-timeline">     <div class="mni">&#128336;</div>Timeline</div>
+        <div class="mob-nav-item"        onclick="nav('pathways')"     id="mn-pathways">     <div class="mni">&#129517;</div>Links</div>
+        <div class="mob-nav-item"        onclick="nav('statement')"    id="mn-statement">    <div class="mni">&#9997;&#65039;</div>Statement</div>
+        <div class="mob-nav-item"        onclick="nav('wellbeing')"    id="mn-wellbeing">    <div class="mni">&#128149;</div>Wellbeing</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="p-dashboard">
+      <div class="ph"><div class="pt" id="d-greet">Welcome &#128075;</div><div class="ps">Here's where things stand today.</div></div>
+      <div class="stats">
+        <div class="sc"><div class="sn" id="s-ach"  style="color:var(--blue)">0</div><div class="sl">Achievements</div></div>
+        <div class="sc"><div class="sn" id="s-sk"   style="color:var(--navy)">0</div><div class="sl">Skills</div></div>
+        <div class="sc"><div class="sn" id="s-dl"   style="color:var(--amber)">0</div><div class="sl">Upcoming</div></div>
+        <div class="sc"><div class="sn" id="s-pct"  style="color:var(--green)">0%</div><div class="sl">Profile</div></div>
+      </div>
+      <div class="card"><div class="ct">&#128200; Profile completion</div><div id="d-bars"></div></div>
+      <div class="card" id="d-dl-card" style="display:none"><div class="ct">&#9200; Coming up next</div><div id="d-dl"></div></div>
+      <div class="card">
+        <div class="ct">&#127919; Why your grades matter</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">Whatever you end up doing, a strong academic foundation keeps your options open.</p>
+        <div class="tier tier-a"><div class="ticon">&#9989;</div><div><div class="ttitle" style="color:var(--green)">Foundation &mdash; every door stays open</div><div class="tdesc">English Language and Maths at grade 4+. The baseline for almost every route after school.</div></div></div>
+        <div class="tier tier-b"><div class="ticon">&#128218;</div><div><div class="ttitle" style="color:var(--amber)">Solid &mdash; sixth form and college routes</div><div class="tdesc">Grade 6 in Maths and Science for Kimberley sixth form entry. Grade 4+ across most subjects opens college courses and Level 3 apprenticeships.</div></div></div>
+        <div class="tier tier-c"><div class="ticon">&#128640;</div><div><div class="ttitle" style="color:var(--blue)">Strong &mdash; competitive opportunities</div><div class="tdesc">Several subjects at grade 5+, broad spread. Opens competitive university courses and premium apprenticeship schemes.</div></div></div>
+        <div class="tier tier-d"><div class="ticon">&#11088;</div><div><div class="ttitle" style="color:var(--navy)">High-demand routes &mdash; worth knowing early</div><div class="tdesc">Medicine, Dentistry, Veterinary Science &mdash; specific A-levels, very high grades and work experience needed. Knowing this now keeps doors open.</div></div></div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-s" onclick="nav('careers')" style="font-size:13px">&#128269; Explore careers &rarr;</button>
+          <a href="https://www.kimberleyschool.co.uk/sixthform" target="_blank" class="btn btn-s" style="font-size:13px;text-decoration:none">&#127891; Kimberley Sixth Form &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY WINS (micro-moments) -->
+    <div class="page" id="p-moments">
+      <div class="ph"><div class="pt">&#127881; My Wins</div><div class="ps">Small victories count. Log anything that made you feel good &mdash; a good test score, a book finished, a new skill. These are just for you.</div></div>
+      <div class="card">
+        <div style="display:flex;gap:10px;align-items:flex-end;">
+          <div style="flex:1"><label>What's your win today?</label><input type="text" id="mom-text" placeholder="e.g. Finished reading a book, got 8/10 on a test..." maxlength="120"></div>
+          <button class="btn btn-p" onclick="addMoment()" style="margin-bottom:12px;white-space:nowrap">&#127881; Log it</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sh"><div class="ct" style="margin-bottom:0">Your wins</div><div id="mom-streak" style="font-size:12px;color:var(--amber);font-weight:700"></div></div>
+        <div id="mom-list"></div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div class="page" id="p-achievements">
+      <div class="ph"><div class="pt">&#11088; Achievements</div><div class="ps">Log the things worth putting on an application &mdash; clubs, activities, awards, work experience, events.</div></div>
+      <details id="ach-det">
+        <summary>&#10133; Add an achievement</summary>
+        <div class="det-body">
+          <div class="fr">
+            <div class="fg"><label>Title</label><input type="text" id="a-title" placeholder="e.g. School football team"></div>
+            <div class="fg"><label>Category</label><select id="a-cat">
+              <option value="sport">Sport</option><option value="arts">Arts &amp; Performance</option>
+              <option value="academic">Academic</option><option value="community">Community &amp; Volunteering</option>
+              <option value="work">Work &amp; Employment</option><option value="careers">Careers Event</option>
+              <option value="other">Other</option>
+            </select></div>
+          </div>
+          <div class="fg"><label>Date / period</label><input type="text" id="a-date" placeholder="e.g. Sept 2024 &ndash; present"></div>
+          <div class="fg"><label>What did you do / achieve?</label><textarea id="a-desc" placeholder="Describe what you did and why it mattered..."></textarea></div>
+          <div class="fg"><label>Skills this shows</label>
+            <div class="sg" id="chips">
+              <div class="chip" data-s="Teamwork">Teamwork</div><div class="chip" data-s="Leadership">Leadership</div>
+              <div class="chip" data-s="Communication">Communication</div><div class="chip" data-s="Problem-solving">Problem-solving</div>
+              <div class="chip" data-s="Resilience">Resilience</div><div class="chip" data-s="Creativity">Creativity</div>
+              <div class="chip" data-s="Organisation">Organisation</div><div class="chip" data-s="Initiative">Initiative</div>
+              <div class="chip" data-s="Commitment">Commitment</div><div class="chip" data-s="Empathy">Empathy</div>
+              <div class="chip" data-s="Time management">Time management</div><div class="chip" data-s="Adaptability">Adaptability</div>
+            </div>
+          </div>
+          <button class="btn btn-p" onclick="addAch()">&#10133; Add achievement</button>
+        </div>
+      </details>
+      <div class="card">
+        <div class="sh">
+          <div class="ct" style="margin-bottom:0">Your achievements</div>
+          <select id="a-filter" style="width:auto;padding:7px 28px 7px 10px;font-size:13px" onchange="renderAch()">
+            <option value="">All</option><option value="sport">Sport</option><option value="arts">Arts</option>
+            <option value="academic">Academic</option><option value="community">Community</option>
+            <option value="work">Work</option><option value="careers">Careers</option><option value="other">Other</option>
+          </select>
+        </div>
+        <div id="ach-list"></div>
+      </div>
+    </div>
+
+    <!-- PRIVATE GOALS -->
+    <div class="page" id="p-goals">
+      <div class="ph"><div class="pt">&#127919; My Goals</div><div class="ps">Write down what you want &mdash; short term, long term, anything. This is just for you and you can change it any time.</div></div>
+      <div class="card">
+        <div class="ct">&#128274; Private &mdash; only you can see this</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6">Writing a goal down makes it more likely to happen. It doesn't have to be perfect &mdash; just honest. You can update it whenever you like.</p>
+        <textarea id="goals-text" placeholder="What do I want? What am I working towards? What would make me proud?&#10;&#10;Write anything here..." oninput="saveGoals()"></textarea>
+        <div style="margin-top:8px;font-size:12px;color:var(--dim)">Saved automatically &mdash; not included in shared summaries.</div>
+      </div>
+      <div class="card">
+        <div class="ct">&#128161; Some prompts if you're stuck</div>
+        <div style="font-size:13px;color:var(--muted);line-height:2;">
+          &#8226; Where do I want to be in 5 years?<br>
+          &#8226; What kind of work would I actually enjoy?<br>
+          &#8226; What grade am I aiming for in my hardest subject?<br>
+          &#8226; What's one thing I want to try that I haven't yet?<br>
+          &#8226; Who do I admire and why?
+        </div>
+      </div>
+    </div>
+
+    <!-- ACADEMIC -->
+    <div class="page" id="p-academic">
+      <div class="ph"><div class="pt">&#128218; My Subjects</div><div class="ps">Set your personal targets and track how confident you feel in each subject.</div></div>
+      <details id="subj-det">
+        <summary>&#10133; Add a subject</summary>
+        <div class="det-body">
+          <div class="fr">
+            <div class="fg"><label>Subject</label>
+              <select id="sj-name" onchange="toggleCustom()">
+                <option value="">&#8212; choose &#8212;</option>
+                <optgroup label="Core"><option>English Language</option><option>English Literature</option><option>Maths</option></optgroup>
+                <optgroup label="Sciences"><option>Biology</option><option>Chemistry</option><option>Physics</option><option>Combined Science</option></optgroup>
+                <optgroup label="Humanities"><option>Geography</option><option>History</option><option>Religious Studies</option></optgroup>
+                <optgroup label="Languages"><option>French</option><option>German</option><option>Spanish</option><option>Mandarin</option></optgroup>
+                <optgroup label="Creative &amp; Technical"><option>Art &amp; Design</option><option>Design Technology</option><option>Drama</option><option>Food Technology</option><option>Music</option><option>Photography</option><option>Textiles</option></optgroup>
+                <optgroup label="Computing &amp; Business"><option>Business Studies</option><option>Computer Science</option><option>Economics</option></optgroup>
+                <optgroup label="PE &amp; Health"><option>Physical Education</option><option>Health &amp; Social Care</option></optgroup>
+                <option value="__c">Other (type below)</option>
+              </select>
+            </div>
+            <div class="fg" id="custom-wrap" style="display:none"><label>Subject name</label><input type="text" id="sj-custom" placeholder="Type subject name"></div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>How am I finding it?</label>
+              <select id="sj-feel">
+                <option value="struggling">&#128543; Struggling</option>
+                <option value="getting-there">&#128578; Getting there</option>
+                <option value="confident" selected>&#128522; Confident</option>
+                <option value="excelling">&#127775; Excelling</option>
+              </select>
+            </div>
+            <div class="fg"><label>My target grade (1&ndash;9)</label><input type="number" id="sj-target" min="1" max="9" placeholder="e.g. 6"></div>
+          </div>
+          <button class="btn btn-p" onclick="addSubj()">&#10133; Add subject</button>
+        </div>
+      </details>
+      <div class="card">
+        <div class="ct">Your subjects</div>
+        <div class="subj-hdr"><span>Subject</span><span>How I'm finding it</span><span>My target grade</span><span></span></div>
+        <div id="subj-list"></div>
+      </div>
+      <details>
+        <summary>&#127919; What do the grades mean for my future?</summary>
+        <div class="det-body">
+          <div class="tier tier-a"><div class="ticon">&#9989;</div><div><div class="ttitle" style="color:var(--green)">Foundation &mdash; every door</div><div class="tdesc">English Language and Maths at grade 4+.</div></div></div>
+          <div class="tier tier-b"><div class="ticon">&#128218;</div><div><div class="ttitle" style="color:var(--amber)">Solid &mdash; sixth form &amp; college</div><div class="tdesc">Grade 6 in Maths and Science for Kimberley sixth form. Grade 4+ across most subjects for college and Level 3 apprenticeships.</div></div></div>
+          <div class="tier tier-c"><div class="ticon">&#128640;</div><div><div class="ttitle" style="color:var(--blue)">Strong &mdash; competitive</div><div class="tdesc">Grade 5+ across several subjects opens competitive universities and premium apprenticeships.</div></div></div>
+          <div class="tier tier-d"><div class="ticon">&#11088;</div><div><div class="ttitle" style="color:var(--navy)">High-demand routes</div><div class="tdesc">Medicine, Dentistry, Vet Science &mdash; specific A-levels and very high grades needed.</div></div></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- CAREER EXPLORER -->
+    <div class="page" id="p-careers">
+      <div class="ph"><div class="pt">&#128269; Career Explorer</div><div class="ps">Type a career you're curious about. It's fine if you're not sure &mdash; just try something.</div></div>
+      <div class="card">
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+          <div style="flex:1;min-width:180px"><label>Type a career or interest</label><input type="text" id="career-input" placeholder="e.g. teacher, engineer, not sure..." onkeydown="if(event.key==='Enter')lookupCareer()"></div>
+          <button class="btn btn-p" onclick="lookupCareer()" style="margin-bottom:12px">Search &rarr;</button>
+        </div>
+        <div style="margin-top:2px;font-size:12px;color:var(--dim);line-height:2">Or pick an area: <span id="cluster-btns"></span></div>
+        <div class="career-result" id="career-result"></div>
+      </div>
+      <div class="card">
+        <div class="ct">&#9888;&#65039; Routes where early awareness really matters</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">These paths have specific requirements &mdash; worth knowing early.</p>
+        <div class="ra"><div class="rat">&#129658; Medicine &amp; Dentistry</div><div class="rad">Chemistry A-level usually required (often Biology too), very high grades, healthcare work experience, and the UCAT test. Understanding this by Year 10 is a real advantage.</div></div>
+        <div class="ra"><div class="rat">&#9878;&#65039; Law</div><div class="rad">No specific A-levels required, but strong essay subjects help. Work experience and a sharp personal statement matter more than many expect.</div></div>
+        <div class="ra"><div class="rat">&#128062; Veterinary Science</div><div class="rad">Among the most competitive courses in the UK. Biology and Chemistry A-levels typical, plus significant hands-on animal experience.</div></div>
+        <div class="ra"><div class="rat">&#127917; Performing Arts &amp; Music</div><div class="rad">Specialist conservatoires use auditions, not grades. Can be as early as January for September entry. Build your portfolio now.</div></div>
+        <div class="ra"><div class="rat">&#9992;&#65039; Armed Forces &amp; Pilot Training</div><div class="rad">Officer routes typically need A-levels. Maths and Physics useful for aviation. Direct entry routes from age 16.</div></div>
+        <div class="ra"><div class="rat">&#127981; Oxford &amp; Cambridge (Oxbridge)</div><div class="rad">Oxbridge can be the right destination for any subject, but the process works differently from every other university. The UCAS deadline is mid-October &mdash; roughly three months earlier than for most universities &mdash; so planning ahead is essential. Most courses also include admissions tests (such as the LNAT for Law, PAT for Physics, or BMAT for Medicine) and a formal interview. Consistently high grades across all subjects are expected throughout your GCSEs and A-levels. If Oxbridge is something you are aiming for, it is worth having a conversation with a teacher by the end of Year 10 so you can prepare properly.</div></div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="page" id="p-timeline">
+      <div class="ph"><div class="pt">&#128336; My Timeline</div><div class="ps">Build your map of the year ahead. Add mock exams, open days, holidays, application deadlines &mdash; anything that matters.</div></div>
+      <div class="card" style="background:rgba(26,86,196,.04);border-color:rgba(26,86,196,.2)">
+        <div class="ct" style="margin-bottom:10px">&#128161; Things worth adding to your timeline</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;font-size:13px;color:var(--muted);line-height:1.9">
+          <div>&#128221; Mock exam windows</div>
+          <div>&#127891; College / sixth form open days</div>
+          <div>&#128197; Application deadlines</div>
+          <div>&#9208;&#65039; Study leave start</div>
+          <div>&#128218; Actual GCSE / A-level exams</div>
+          <div>&#127956; DofE expedition dates</div>
+          <div>&#127775; Results day</div>
+          <div>&#128172; Careers interviews at school</div>
+          <div>&#127968; School holidays</div>
+          <div>&#9989; Personal targets &amp; goals</div>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-top:12px;line-height:1.6;border-top:1px solid var(--border);padding-top:10px">&#128161; <strong style="color:var(--navy)">Tip:</strong> Add your mock dates first, then work backwards &mdash; when do you need to start revising to feel ready? Seeing the year laid out tends to make it feel more manageable, not less.</p>
+      </div>
+      <details id="tl-det">
+        <summary>&#10133; Add an event</summary>
+        <div class="det-body">
+          <div class="fr">
+            <div class="fg"><label>Event name</label><input type="text" id="tl-title" placeholder="e.g. Mock exams week"></div>
+            <div class="fg"><label>Type</label>
+              <select id="tl-type">
+                <option value="exam">Exam / Mock</option><option value="holiday">Holiday / break</option>
+                <option value="careers">Careers event / open day</option><option value="application">Application deadline</option>
+                <option value="personal">Personal milestone</option><option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>Date</label><input type="date" id="tl-date"></div>
+            <div class="fg"><label>Notes (optional)</label><input type="text" id="tl-notes" placeholder="e.g. Hall B, bring ID"></div>
+          </div>
+          <button class="btn btn-p" onclick="addTlEvent()">&#10133; Add to timeline</button>
+        </div>
+      </details>
+      <div class="card"><div class="ct">&#128336; Your year</div><div id="tl-list"></div></div>
+    </div>
+
+    <!-- PATHWAYS -->
+    <div class="page" id="p-pathways">
+      <div class="ph"><div class="pt">&#129517; Pathways &amp; Links</div><div class="ps">Explore your options. No decision needed yet &mdash; just look around.</div></div>
+      <div class="card">
+        <div class="ct">&#128279; Useful links</div>
+        <div class="pgrid">
+          <a href="https://www.gov.uk/apply-apprenticeship" target="_blank" class="pc"><div class="picon">&#128295;</div><div class="ptitle">Find an Apprenticeship</div><div class="pdesc">Search and apply for apprenticeships across England. New ones added all the time.</div></a>
+          <a href="https://www.kimberleyschool.co.uk/sixthform" target="_blank" class="pc"><div class="picon">&#127891;</div><div class="ptitle">Kimberley Sixth Form</div><div class="pdesc">Find out what courses are available and what you need to get in.</div></a>
+          <a href="https://www.ucas.com" target="_blank" class="pc"><div class="picon">&#127979;</div><div class="ptitle">UCAS</div><div class="pdesc">University applications. Good for exploring courses even years before you apply.</div></a>
+          <a href="https://nationalcareers.service.gov.uk" target="_blank" class="pc"><div class="picon">&#128506;</div><div class="ptitle">National Careers Service</div><div class="pdesc">Explore job profiles, qualifications needed and salary info.</div></a>
+          <a href="https://www.notgoingtouni.co.uk" target="_blank" class="pc"><div class="picon">&#128724;</div><div class="ptitle">Not Going to Uni</div><div class="pdesc">Apprenticeships, school leaver programmes and alternatives to university.</div></a>
+        </div>
+      </div>
+
+      <details>
+        <summary>&#127891; Understanding qualifications &mdash; what does it all mean?</summary>
+        <div class="det-body">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Qualifications in England are organised into levels. Knowing where things sit helps you understand what different routes actually lead to &mdash; and there is no single right path through them.</p>
+
+          <div style="border-left:3px solid var(--border);padding-left:14px;margin-bottom:13px">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:3px">Entry Level</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.5">Entry 1, 2 and 3. Stepping-stone qualifications building core skills in English, Maths and vocational areas.</div>
+          </div>
+
+          <div style="border-left:3px solid var(--amber);padding-left:14px;margin-bottom:13px">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:3px">Level 1</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.5">Foundation GCSEs (grades 1&ndash;3), some BTECs, NVQ Level 1. A starting point for vocational and practical routes.</div>
+          </div>
+
+          <div style="border-left:3px solid var(--green);padding-left:14px;margin-bottom:13px">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:3px">Level 2 &mdash; where you are now</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.5">GCSEs at grades 4&ndash;9, BTEC First/Level 2, NVQ Level 2, Level 2 Apprenticeships. This is the standard school-leaving qualification level and the foundation for almost every further route.</div>
+          </div>
+
+          <div style="border-left:3px solid var(--blue);padding-left:14px;margin-bottom:13px">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:3px">Level 3 &mdash; sixth form and college</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.5">A-levels, T-Levels, BTEC National (Extended Diploma), Access to HE, Level 3 Apprenticeships, International Baccalaureate. The main gateway to university, higher apprenticeships and professional training.<br><br><strong style="color:var(--navy)">T-Levels</strong> are a newer two-year technical qualification equivalent to three A-levels. They include a substantial industry work placement and lead directly into skilled employment or higher study &mdash; a strong option if you know the area you want to work in.</div>
+          </div>
+
+          <div style="border-left:3px solid #3b5a9a;padding-left:14px;margin-bottom:13px">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:3px">Level 4 &amp; 5 &mdash; higher education (below degree)</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.5">Higher National Certificate (HNC), Higher National Diploma (HND), Foundation Degrees, Higher Apprenticeships. Often studied at college or through an employer. A well-regarded and practical route into professional careers, sometimes with less debt than a full degree.</div>
+          </div>
+
+          <div style="border-left:3px solid var(--navy);padding-left:14px;margin-bottom:13px">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:3px">Level 6 &mdash; degree</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.5">Bachelor's degrees (BA, BSc), Degree Apprenticeships. The traditional university route &mdash; but also now available through employers via degree apprenticeships, which means no tuition fees and a salary while you study.</div>
+          </div>
+
+          <div style="border-left:3px solid var(--navy);padding-left:14px;margin-bottom:13px;opacity:.8">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:3px">Level 7 &amp; above</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.5">Master's degrees, postgraduate certificates, and some professional qualifications (e.g. solicitor, chartered accountant). Typically reached after a degree or through a professional training route.</div>
+          </div>
+
+          <div style="margin-top:4px;background:rgba(26,86,196,.06);border-radius:var(--rs);padding:12px 14px;font-size:13px;color:var(--muted);line-height:1.6">
+            &#128161; <strong style="color:var(--navy)">The key thing to know:</strong> you do not have to go straight from GCSEs to A-levels to a degree. Many people step up level by level, change direction, or combine work and study. Every level is a valid destination in its own right &mdash; and a stepping stone to the next if you want it to be.
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- STATEMENT -->
+    <div class="page" id="p-statement">
+      <div class="ph"><div class="pt">&#9997;&#65039; My Statement</div><div class="ps">Turn your logged achievements into something an employer or college would actually want to read.</div></div>
+      <div class="card">
+        <div class="ct">&#128203; Generate a statement</div>
+        <div class="fr">
+          <div class="fg"><label>I'm writing this for...</label>
+            <select id="st-purpose">
+              <option value="apprenticeship">An apprenticeship application</option>
+              <option value="college">A college / sixth form application</option>
+              <option value="cv">A CV or job application</option>
+              <option value="ucas">A UCAS personal statement</option>
+              <option value="general">General &mdash; just to see how it sounds</option>
+            </select>
+          </div>
+          <div class="fg"><label>Focus on (optional)</label><input type="text" id="st-focus" placeholder="e.g. teamwork, caring roles"></div>
+        </div>
+        <button class="btn btn-p" onclick="genStatement()">&#10024; Generate my statement</button>
+      </div>
+      <div class="card">
+        <div class="sh"><div class="ct" style="margin-bottom:0">Your statement</div><button class="copy-btn" onclick="copyStmt()">&#128203; Copy</button></div>
+        <div id="stmt-out"><div class="empty"><div class="ei">&#9997;&#65039;</div>Your statement will appear here once you click Generate.</div></div>
+        <div style="margin-top:10px;font-size:12px;color:var(--dim)">This is a starting draft &mdash; read it, edit it, and make it sound like you.</div>
+      </div>
+      <div class="card">
+        <div class="ct">&#128231; Share with your teacher</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6">Download a summary of your achievements and statement to share with a teacher or careers adviser.</p>
+        <button class="btn btn-s" onclick="dlSummary()">&#128196; Download summary</button>
+      </div>
+    </div>
+
+    <!-- DUKE OF EDINBURGH -->
+    <div class="page" id="p-dofe">
+      <div class="ph"><div class="pt">&#127956; Duke of Edinburgh</div><div class="ps">Track your DofE progress here. Completed sections count as real achievements for applications.</div></div>
+
+      <div class="card" style="background:rgba(26,86,196,.04);border:1px solid rgba(26,86,196,.2)">
+        <p style="font-size:13px;color:var(--muted);line-height:1.7">&#128218; <strong style="color:var(--navy)">About the award:</strong> The Duke of Edinburgh Award has three levels &mdash; Bronze, Silver and Gold. Each involves four sections: <strong>Volunteering</strong>, <strong>Physical</strong>, <strong>Skill</strong> and <strong>Expedition</strong>. Gold also includes a <strong>Residential</strong> project. You work on each section for a set period, log your progress, and when complete it is a widely recognised achievement that stands out on applications and personal statements.</p>
+      </div>
+
+      <div class="card">
+        <div class="ct">&#127942; My award level</div>
+        <div class="fr">
+          <div class="fg">
+            <label>Award level</label>
+            <select id="dofe-level" onchange="saveDofE()">
+              <option value="">Not started yet</option>
+              <option value="bronze">&#129353; Bronze</option>
+              <option value="silver">&#129352; Silver</option>
+              <option value="gold">&#129351; Gold</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Overall status</label>
+            <select id="dofe-status" onchange="saveDofE()">
+              <option value="planning">Planning / not started</option>
+              <option value="inprogress">In progress</option>
+              <option value="complete">Completed &#10003;</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="dofe-sections">
+        <!-- rendered by JS -->
+      </div>
+
+      <div class="card">
+        <div class="ct">&#128221; Notes &amp; reflections</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.6">Use this space to note what you have done, who you did it with, and what you got out of it. This is useful when it comes to writing your personal statement or preparing for an interview.</p>
+        <textarea id="dofe-notes" placeholder="e.g. For my Volunteering section I helped at the local food bank every Saturday for three months. I developed..." style="min-height:100px" oninput="saveDofE()"></textarea>
+      </div>
+
+      <div class="card">
+        <div class="ct">&#128279; Useful DofE links</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <a href="https://www.dofe.org" target="_blank" style="font-size:14px;color:var(--blue);font-weight:600;text-decoration:none">&#127758; dofe.org &mdash; official DofE website</a>
+          <a href="https://www.dofe.org/do/activities/" target="_blank" style="font-size:14px;color:var(--blue);font-weight:600;text-decoration:none">&#128269; Activity ideas for each section</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- WELLBEING -->
+    <div class="page" id="p-wellbeing">
+      <div class="ph"><div class="pt">&#128149; Wellbeing</div><div class="ps">School can be a lot sometimes. These are here whenever you need them.</div></div>
+      <div class="mh-card">
+        <div class="mh-title">&#128149; Feeling overwhelmed? You're not alone.</div>
+        <p style="font-size:13px;color:var(--text);line-height:1.7">Everyone has times when things feel too much. Reaching out is a sign of strength. The links below are trusted, free, and confidential.</p>
+        <div class="mh-links">
+          <a href="https://www.youngminds.org.uk" target="_blank" class="mh-link"><div class="mh-link-name">&#129505; YoungMinds</div><div class="mh-link-desc">Mental health support for young people. Advice, crisis support and a helpline.</div></a>
+          <a href="https://www.childline.org.uk" target="_blank" class="mh-link"><div class="mh-link-name">&#128222; Childline</div><div class="mh-link-desc">Free, confidential support. Call 0800 1111 or chat online, any time.</div></a>
+          <a href="https://www.kooth.com" target="_blank" class="mh-link"><div class="mh-link-name">&#128172; Kooth</div><div class="mh-link-desc">Free NHS-commissioned online wellbeing for young people. No waiting list.</div></a>
+          <a href="https://www.mind.org.uk" target="_blank" class="mh-link"><div class="mh-link-name">&#129504; Mind</div><div class="mh-link-desc">Information and advice about mental health and where to get help.</div></a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct">&#127891; Talk to someone at school</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px">Your form tutor or head of year is always a good first contact if something is worrying you. You don't need to have it all figured out before you speak to someone.</p>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7">If things ever feel urgent, tell a trusted adult straightaway or call Childline on <strong style="color:var(--navy)">0800 1111</strong>.</p>
+      </div>
+      <div class="card">
+        <div class="ct">&#127774; Small things that can help</div>
+        <div style="font-size:13px;color:var(--muted);line-height:2.1">
+          &#128149; Talk to someone you trust<br>
+          &#128694; Get outside, even for 10 minutes<br>
+          &#128564; Aim for 8&ndash;9 hours sleep &mdash; it matters more than late revision<br>
+          &#128247; Take a break from your phone for a while each day<br>
+          &#9997; Write it down &mdash; even just for yourself<br>
+          &#127381; Celebrate small wins &mdash; that's what this app is for
+        </div>
+      </div>
+    </div>
+
+  </div><!-- #main -->
+</div><!-- #app -->
+<div id="toast"></div>
+
+<script>
+var state = {
+  profile:{name:'',year:''},
+  achievements:[],
+  moments:[],
+  goals:'',
+  subjects:[],
+  timeline:[],
+  dofe:{level:'',status:'planning',sections:{},notes:''}
+};
+
+var CAT={sport:'Sport',arts:'Arts & Perf.',academic:'Academic',community:'Community',work:'Work',careers:'Careers Event',other:'Other'};
+var FEEL={struggling:'Struggling','getting-there':'Getting there',confident:'Confident',excelling:'Excelling'};
+var FEELE={struggling:'😟','getting-there':'🙂',confident:'😊',excelling:'🌟'};
+var FEELC={struggling:'var(--red)','getting-there':'var(--amber)',confident:'var(--blue)',excelling:'var(--green)'};
+var TL_TYPE={exam:'Exam/Mock',holiday:'Holiday',careers:'Careers Event',application:'Application',personal:'Personal',other:'Other'};
+var TL_COL={exam:'var(--red)',holiday:'var(--green)',careers:'var(--blue)',application:'var(--amber)',personal:'var(--navy)',other:'var(--muted)'};
+
+var CLUSTERS={
+  trades:{label:'Trades & Apprenticeships',icon:'🔧',
+    ideal:'English and Maths at grade 5 give you a strong advantage when applying, and many employers ask for them',
+    helpful:'A relevant vocational GCSE (Design Technology, Food Technology) is a great addition',
+    route:'Apprenticeship — Level 2 or Level 3',
+    detail:'Most trades offer apprenticeships where you earn while you learn. The higher your grades, the more competitive your application will be — even for trade routes.'},
+  creative:{label:'Creative & Performing Arts',icon:'🎨',
+    ideal:'English and Maths at grade 5 keep all your options open. For degree routes, grade 6+ helps',
+    helpful:'Art, Drama, Photography or Music GCSE. Start building a portfolio or performance record as early as possible',
+    route:'Portfolio + audition, or Art/Drama A-level',
+    detail:'Specialist colleges and conservatoires often use auditions and portfolios alongside grades. The earlier you start building evidence of your creative work, the stronger your application.'},
+  sports:{label:'Sport & Physical Education',icon:'⚽',
+    ideal:'English and Maths at grade 5, PE GCSE — these open most sports-related pathways',
+    helpful:'Science GCSE at grade 5 for sports science or physiotherapy routes',
+    route:'Sports science degree, coaching qualifications, or apprenticeship',
+    detail:"Professional sport is very competitive — strong qualifications alongside your sport keeps every door open. Sports coaching and physiotherapy are excellent, in-demand careers that combine sport with real job security."},
+  teaching:{label:'Teaching & Education',icon:'📚',
+    ideal:'English and Maths at grade 6 — these are typically required for teacher training',
+    helpful:'A strong GCSE in the subject you want to teach (grade 6+) is a real advantage for secondary teaching',
+    route:'University degree + teacher training (PGCE)',
+    detail:"Teaching is one of the most rewarding and common careers. You'll need a degree in a relevant subject, then a teaching qualification. Gaining experience with young people early — volunteering, tutoring, sports coaching — makes your application much stronger."},
+  care:{label:'Social Care, Childcare & Support Work',icon:'🤝',
+    ideal:'English and Maths at grade 5 or above open most routes; grade 6 for degree-level pathways',
+    helpful:'Health & Social Care or Child Development GCSE — shows genuine commitment to this area',
+    route:'University degree or Level 3 apprenticeship',
+    detail:'Many care roles now offer degree apprenticeships — you can earn a full salary and gain a degree at the same time. Volunteering experience with young people or vulnerable adults is very highly valued.'},
+  business:{label:'Business, Finance & Law',icon:'💼',
+    ideal:'English at grade 6 and Maths at grade 5 — higher grades open more doors in competitive fields like law and finance',
+    helpful:'Essay-based A-levels (English, History, Politics) for law; Maths A-level for finance and accounting',
+    route:'University degree or degree apprenticeship',
+    detail:'Law, finance and business all now have strong apprenticeship routes including degree level — you can reach a fully qualified professional career without university debt. For law especially, work experience and a strong personal statement matter enormously.'},
+  stem:{label:'Engineering, Computing & Technology',icon:'⚙️',
+    ideal:'Maths at grade 7 and Science at grade 6 — Maths is the single most important qualification for most STEM routes',
+    helpful:'Computer Science GCSE for software roles; Art or Design for architecture',
+    route:'University degree or higher/degree apprenticeship',
+    detail:"Engineering and tech offer some of the best-paid apprenticeships anywhere — Rolls-Royce, BT, Network Rail and others recruit at 18 with full training. Strong Maths really does open doors here that are closed to others."},
+  medical:{label:'Medicine, Science & Healthcare',icon:'🩺',
+    ideal:'Maths and English at grade 6+, Science at grade 6+ — these are typically the minimum for healthcare degree courses',
+    helpful:'Biology and Chemistry A-levels are essential for medicine, dentistry and vet science',
+    route:'University degree (highly competitive for medicine/vet)',
+    detail:'Medicine, Dentistry and Veterinary Science are among the most competitive courses in the UK. You will need Biology and Chemistry A-levels, very high grades, relevant work experience, and admissions tests (UCAT for medicine/dentistry). Starting to plan this in Year 10 is genuinely not too early.'},
+  public:{label:'Public Service & Armed Forces',icon:'🛡️',
+    ideal:'English, Maths and Science at grade 4+ are typically the minimum — higher grades improve your chances significantly',
+    helpful:'Languages GCSE is a real advantage for some roles; fitness matters as much as grades for many services',
+    route:'Direct entry, Level 3 qualification, or degree apprenticeship',
+    detail:'Most uniformed services have minimum fitness and qualification requirements. Police now offer degree apprenticeships. Armed forces have entry routes from age 16. Physical fitness and resilience matter alongside academic achievement.'},
+  animals:{label:'Animals & Countryside',icon:'🐾',
+    ideal:'English and Maths at grade 5, Science at grade 5 — these are expected for most college and university routes in this area',
+    helpful:'Biology GCSE; hands-on animal experience from as early as possible is essential',
+    route:'Apprenticeship, vocational course or university',
+    detail:'Practical experience with animals is as important as qualifications for almost all roles here — voluntary work on farms, at stables or with rescue organisations is genuinely valued. The earlier you start, the stronger your application.'},
+  unsure:{label:"Not sure yet — and that's completely fine",icon:'🤷',
+    ideal:'English and Maths at grade 4+ — this genuinely keeps every door open',
+    helpful:'As many subjects as possible at grade 5 — a broad, strong set of GCSEs gives you the most choices at 16 and 18',
+    route:"Don't worry — most people change their mind several times",
+    detail:"The most useful thing right now is focus on English and Maths, keep your options broad, and say yes to experiences — work experience, clubs, volunteering. The answers tend to come from doing things, not deciding in advance. Most careers advisers will tell you the same thing."}
+};
+
+var KW_MAP={
+  'joiner':'trades','electrician':'trades','mechanic':'trades','plumber':'trades','builder':'trades','bricklayer':'trades','carpenter':'trades','welder':'trades','butcher':'trades','baker':'trades','chef':'trades','hairdresser':'trades','beauty':'trades','beautician':'trades','barber':'trades','plumbing':'trades','painter':'trades','decorator':'trades','tiler':'trades','roofer':'trades','construction':'trades',
+  'actor':'creative','actress':'creative','acting':'creative','photography':'creative','photographer':'creative','artist':'creative','art':'creative','design':'creative','stylist':'creative','fashion':'creative','drama':'creative','dancer':'creative','dance':'creative','musician':'creative','music':'creative','media':'creative','radio':'creative','tv':'creative','film':'creative','author':'creative','writer':'creative','illustrator':'creative','animator':'creative','journalist':'creative','presenter':'creative','content creator':'creative','influencer':'creative',
+  'sport':'sports','sports':'sports','footballer':'sports','football':'sports','basketball':'sports','gymnastics':'sports','gymnast':'sports','athlete':'sports','pe teacher':'sports','sports coach':'sports','coach':'sports','physiotherapy':'sports','physiotherapist':'sports','fitness':'sports','boxing':'sports','boxer':'sports','rugby':'sports','cricket':'sports','swimming':'sports','tennis':'sports','netball':'sports',
+  'teacher':'teaching','teaching':'teaching','primary teacher':'teaching','nursery teacher':'teaching','nursery':'teaching','ta':'teaching','teaching assistant':'teaching','lecturer':'teaching','tutor':'teaching','senco':'teaching','early years':'teaching','educator':'teaching',
+  'social worker':'care','social work':'care','childcare':'care','child development':'care','therapist':'care','counsellor':'care','psychologist':'care','youth worker':'care','care worker':'care','support worker':'care','healthcare assistant':'care',
+  'law':'business','lawyer':'business','solicitor':'business','barrister':'business','accountant':'business','finance':'business','business':'business','banking':'business','economics':'business','economist':'business','entrepreneur':'business','own business':'business','marketing':'business','management':'business','insurance':'business','hr':'business',
+  'engineer':'stem','engineering':'stem','software':'stem','computer':'stem','computing':'stem','ict':'stem','programmer':'stem','developer':'stem','architect':'stem','architecture':'stem','aerospace':'stem','it':'stem','robotics':'stem','data':'stem','ai':'stem','technician':'stem','electronics':'stem','game developer':'stem','cybersecurity':'stem',
+  'doctor':'medical','medicine':'medical','medical':'medical','vet':'medical','veterinary':'medical','dentist':'medical','dentistry':'medical','nurse':'medical','nursing':'medical','midwife':'medical','midwifery':'medical','pharmacy':'medical','pharmacist':'medical','paramedic':'medical','radiographer':'medical','forensics':'medical','forensic':'medical','scientist':'medical','biologist':'medical','chemist':'medical','optician':'medical','surgeon':'medical',
+  'police':'public','detective':'public','army':'public','navy':'public','raf':'public','air force':'public','firefighter':'public','fire':'public','ambulance':'public','prison':'public','armed forces':'public','military':'public','coastguard':'public','translator':'public','interpreter':'public','pilot':'public','border force':'public',
+  'vet nurse':'animals','animal care':'animals','zookeeper':'animals','zoo':'animals','equestrian':'animals','horse':'animals','farming':'animals','farm':'animals','agriculture':'animals','conservation':'animals','ranger':'animals','wildlife':'animals',
+  'not sure':'unsure','unsure':'unsure','no idea':'unsure','dont know':'unsure',"don't know":'unsure','anything':'unsure','nothing':'unsure','undecided':'unsure'
+};
+
+function lookupCareer(){
+  var raw=document.getElementById('career-input').value.trim().toLowerCase();
+  if(!raw){toast('Type something first!');return;}
+  var cluster=KW_MAP[raw]||null;
+  if(!cluster){
+    var keys=Object.keys(KW_MAP);
+    for(var i=0;i<keys.length;i++){
+      if(raw.indexOf(keys[i])!==-1||keys[i].indexOf(raw)!==-1){cluster=KW_MAP[keys[i]];break;}
+    }
+  }
+  if(!cluster)cluster='unsure';
+  showCareerResult(cluster);
+}
+
+function showCareerResult(cid){
+  var c=CLUSTERS[cid];
+  var el=document.getElementById('career-result');
+  el.innerHTML=
+    '<div class="cr-head"><div class="cr-icon">'+c.icon+'</div><div class="cr-title">'+c.label+'</div></div>'+
+    '<div class="cr-row"><div class="cr-lbl">Ideal grades</div><div class="cr-val">'+c.ideal+'</div></div>'+
+    '<div class="cr-row"><div class="cr-lbl">Also helpful</div><div class="cr-val">'+c.helpful+'</div></div>'+
+    '<div class="cr-row"><div class="cr-lbl">Typical route</div><div class="cr-val"><strong>'+c.route+'</strong></div></div>'+
+    '<div class="cr-detail">'+c.detail+'</div>';
+  el.className='career-result show';
+}
+
+window.addEventListener('DOMContentLoaded',function(){
+  var ids=['trades','creative','sports','teaching','care','business','stem','medical','public','animals','unsure'];
+  var btns=document.getElementById('cluster-btns');
+  btns.innerHTML=ids.map(function(id){
+    return '<span onclick="showCareerResult(\''+id+'\')" style="cursor:pointer;display:inline-block;margin:3px 3px 0 0;padding:5px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;font-size:12px;color:var(--muted);transition:all .15s" onmouseover="this.style.borderColor=\'var(--blue)\';this.style.color=\'var(--blue)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--muted)\'">'+CLUSTERS[id].icon+' '+CLUSTERS[id].label.split('&')[0].split('—')[0].trim()+'</span>';
+  }).join('');
+  document.querySelectorAll('.chip').forEach(function(c){c.addEventListener('click',function(){c.classList.toggle('sel');});});
+  checkAutosave();
+});
+
+function startApp(){
+  var name=document.getElementById('w-name').value.trim();
+  var year=document.getElementById('w-year').value;
+  if(!name){toast('Please enter your name 😊');return;}
+  if(!year){toast('Please select your year group');return;}
+  state.profile={name:name,year:year};
+  launch();
+}
+function launch(){
+  document.getElementById('welcome').style.display='none';
+  document.getElementById('app').style.display='flex';
+  updateDash();renderMoments();renderAch();renderSubj();renderTimeline();
+  var g=document.getElementById('goals-text');
+  if(g)g.value=state.goals||'';
+  renderDofE();
+}
+
+function nav(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-item,.mob-nav-item').forEach(function(n){n.classList.remove('active');});
+  document.getElementById('p-'+id).classList.add('active');
+  var dn=document.getElementById('n-'+id);
+  var mn=document.getElementById('mn-'+id);
+  if(dn)dn.classList.add('active');
+  if(mn)mn.classList.add('active');
+  if(id==='dashboard')updateDash();
+  if(id==='achievements')renderAch();
+  if(id==='moments')renderMoments();
+  if(id==='academic')renderSubj();
+  if(id==='timeline')renderTimeline();
+  if(id==='dofe')renderDofE();
+}
+
+// MICRO MOMENTS
+function addMoment(){
+  var text=document.getElementById('mom-text').value.trim();
+  if(!text){toast('What\'s your win? Type something!');return;}
+  state.moments.unshift({id:Date.now(),text:text,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'}),done:false});
+  document.getElementById('mom-text').value='';
+  renderMoments();updateDash();confetti();toast('Win logged! 🎉');autosave();
+}
+function toggleMoment(id){var m=state.moments.find(function(x){return x.id===id;});if(m){m.done=!m.done;if(m.done)confetti();renderMoments();autosave();}}
+function delMoment(id){state.moments=state.moments.filter(function(x){return x.id!==id;});renderMoments();updateDash();autosave();}
+function renderMoments(){
+  var list=document.getElementById('mom-list');
+  if(!state.moments.length){list.innerHTML='<div class="empty"><div class="ei">🎉</div>Log your first win — anything counts!</div>';return;}
+  var streak=0;
+  var today=new Date();today.setHours(0,0,0,0);
+  var d=new Date(today);
+  for(var i=0;i<30;i++){
+    var ds=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    if(state.moments.some(function(m){return m.date===ds;}))streak++;
+    else if(i>0)break;
+    d.setDate(d.getDate()-1);
+  }
+  var streakEl=document.getElementById('mom-streak');
+  if(streakEl)streakEl.textContent=streak>1?'🔥 '+streak+' day streak!':'';
+  list.innerHTML=state.moments.slice(0,30).map(function(m){
+    return '<div class="moment-item'+(m.done?' done':'')+'">'+
+      '<div class="moment-ck'+(m.done?' chk':'')+'" onclick="toggleMoment('+m.id+')">'+(m.done?'✓':'')+'</div>'+
+      '<div class="moment-text">'+esc(m.text)+'</div>'+
+      '<div class="moment-date">'+esc(m.date)+'</div>'+
+      '<div class="moment-del" onclick="delMoment('+m.id+')">×</div>'+
+    '</div>';
+  }).join('');
+}
+
+// GOALS
+function saveGoals(){state.goals=document.getElementById('goals-text').value;autosave();}
+
+// ACHIEVEMENTS
+function addAch(){
+  var title=document.getElementById('a-title').value.trim();
+  if(!title){toast('Please add a title');return;}
+  var skills=[];document.querySelectorAll('.chip.sel').forEach(function(c){skills.push(c.dataset.s);});
+  state.achievements.push({id:Date.now(),title:title,cat:document.getElementById('a-cat').value,date:document.getElementById('a-date').value.trim(),desc:document.getElementById('a-desc').value.trim(),skills:skills,done:false});
+  document.getElementById('a-title').value='';document.getElementById('a-date').value='';document.getElementById('a-desc').value='';
+  document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('sel');});
+  document.getElementById('ach-det').removeAttribute('open');
+  renderAch();updateDash();confetti();toast('Achievement added! ⭐');autosave();
+}
+function toggleAch(id){var a=state.achievements.find(function(x){return x.id===id;});if(a){a.done=!a.done;if(a.done)confetti();renderAch();autosave();}}
+function delAch(id){state.achievements=state.achievements.filter(function(x){return x.id!==id;});renderAch();updateDash();autosave();}
+function renderAch(){
+  var list=document.getElementById('ach-list');
+  var filter=document.getElementById('a-filter').value;
+  var items=state.achievements.filter(function(a){return !filter||a.cat===filter;});
+  if(!items.length){list.innerHTML='<div class="empty"><div class="ei">⭐</div>Nothing here yet — what\'s the first thing you\'re proud of?</div>';return;}
+  list.innerHTML=items.map(function(a){
+    return '<div class="ai'+(a.done?' done':'')+'">'+
+      '<div class="ck'+(a.done?' chk':'')+'" onclick="toggleAch('+a.id+')">'+(a.done?'✓':'')+'</div>'+
+      '<div class="ab"><div class="at">'+esc(a.title)+'</div>'+(a.desc?'<div class="ad">'+esc(a.desc)+'</div>':'')+
+      '<div class="am"><span class="tag t-'+a.cat+'">'+(CAT[a.cat]||a.cat)+'</span>'+(a.date?'<span>📅 '+esc(a.date)+'</span>':'')+
+      a.skills.map(function(s){return '<span class="tag t-skill">'+s+'</span>';}).join('')+'</div></div>'+
+      '<span class="adel" onclick="delAch('+a.id+')">×</span></div>';
+  }).join('');
+}
+
+// SUBJECTS
+function toggleCustom(){var v=document.getElementById('sj-name').value;document.getElementById('custom-wrap').style.display=v==='__c'?'':'none';}
+function addSubj(){
+  var sel=document.getElementById('sj-name');
+  var name=sel.value==='__c'?document.getElementById('sj-custom').value.trim():sel.value;
+  if(!name||name==='— choose —'){toast('Please choose a subject');return;}
+  if(state.subjects.find(function(s){return s.name===name;})){toast('Already listed');return;}
+  state.subjects.push({id:Date.now(),name:name,feel:document.getElementById('sj-feel').value,target:document.getElementById('sj-target').value.trim()});
+  sel.value='';document.getElementById('sj-target').value='';
+  document.getElementById('custom-wrap').style.display='none';
+  document.getElementById('subj-det').removeAttribute('open');
+  renderSubj();updateDash();toast('Subject added! 📚');autosave();
+}
+function updSubj(id,field,val){var s=state.subjects.find(function(x){return x.id===id;});if(s){s[field]=val;autosave();}}
+function delSubj(id){state.subjects=state.subjects.filter(function(x){return x.id!==id;});renderSubj();updateDash();autosave();}
+function renderSubj(){
+  var list=document.getElementById('subj-list');
+  if(!state.subjects.length){list.innerHTML='<div class="empty" style="padding:20px"><div class="ei">📚</div>No subjects yet — add one above.</div>';return;}
+  list.innerHTML=state.subjects.map(function(s){
+    var opts=Object.keys(FEEL).map(function(v){return '<option value="'+v+'"'+(s.feel===v?' selected':'')+'>'+FEELE[v]+' '+FEEL[v]+'</option>';}).join('');
+    return '<div class="subj-row"><div class="subj-name">'+esc(s.name)+'</div>'+
+      '<div><select onchange="updSubj('+s.id+',\'feel\',this.value)" style="font-size:12px;padding:5px 7px;color:'+FEELC[s.feel]+'">'+opts+'</select></div>'+
+      '<div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;color:var(--muted);white-space:nowrap">Target:</span><input type="number" min="1" max="9" value="'+esc(s.target)+'" placeholder="1-9" style="width:60px;font-size:13px;padding:5px 7px" onchange="updSubj('+s.id+',\'target\',this.value)"></div>'+
+      '<div class="subj-del" onclick="delSubj('+s.id+')">×</div></div>';
+  }).join('');
+}
+
+// TIMELINE
+function addTlEvent(){
+  var title=document.getElementById('tl-title').value.trim();
+  var date=document.getElementById('tl-date').value;
+  if(!title){toast('Please add a title');return;}
+  if(!date){toast('Please add a date');return;}
+  state.timeline.push({id:Date.now(),title:title,type:document.getElementById('tl-type').value,date:date,notes:document.getElementById('tl-notes').value.trim()});
+  document.getElementById('tl-title').value='';document.getElementById('tl-date').value='';document.getElementById('tl-notes').value='';
+  document.getElementById('tl-det').removeAttribute('open');
+  renderTimeline();toast('Added to your timeline! 📅');autosave();
+}
+function delTlEvent(id){state.timeline=state.timeline.filter(function(x){return x.id!==id;});renderTimeline();autosave();}
+function renderTimeline(){
+  var list=document.getElementById('tl-list');
+  if(!state.timeline.length){list.innerHTML='<div class="empty"><div class="ei">🗓️</div>Add your mock exams, open days and key dates above.<br><br>Tip: add them all at once to see your year at a glance.</div>';return;}
+  var sorted=[].concat(state.timeline).sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+  var today=new Date();today.setHours(0,0,0,0);
+  list.innerHTML='<div class="tl-wrap"><div class="tl-line"></div>'+
+    sorted.map(function(e){
+      var d=new Date(e.date);
+      var diff=Math.ceil((d-today)/86400000);
+      var dotCls=diff<0?'past':diff===0?'now':diff<=14?'soon':'';
+      var isNow=diff===0;
+      var ds=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+      var diffStr=diff<0?'Passed':diff===0?'Today!':diff===1?'Tomorrow':diff+' days away';
+      return '<div class="tl-item"><div class="tl-dot '+dotCls+'"></div>'+
+        '<div class="tl-content'+(isNow?' now-item':'')+'">'+
+        '<span class="tl-del" onclick="delTlEvent('+e.id+')">×</span>'+
+        '<div class="tl-title">'+esc(e.title)+'</div>'+
+        '<div class="tl-meta" style="color:'+TL_COL[e.type]+'">'+TL_TYPE[e.type]+'</div>'+
+        '<div class="tl-meta">'+ds+' &nbsp;&middot;&nbsp; <strong>'+diffStr+'</strong>'+(e.notes?' &nbsp;&middot;&nbsp; '+esc(e.notes):'')+'</div>'+
+        '</div></div>';
+    }).join('')+'</div>';
+}
+
+// DASHBOARD
+function updateDash(){
+  var n=state.profile.name;
+  document.getElementById('d-greet').textContent=n?'Hey '+n+' 👋':'Welcome 👋';
+  var allSk=new Set(state.achievements.flatMap(function(a){return a.skills;}));
+  var today=new Date();today.setHours(0,0,0,0);
+  var upcoming=state.timeline.filter(function(e){return Math.ceil((new Date(e.date)-today)/86400000)>=0;}).length;
+  var done=0;
+  if(state.profile.name)done++;
+  if(state.achievements.length>=3||state.moments.length>=5)done++;
+  if(state.subjects.length>=3)done++;
+  if(state.timeline.length>=1)done++;
+  document.getElementById('s-ach').textContent=state.achievements.length;
+  document.getElementById('s-sk').textContent=allSk.size;
+  document.getElementById('s-dl').textContent=upcoming;
+  document.getElementById('s-pct').textContent=Math.round((done/4)*100)+'%';
+  document.getElementById('d-bars').innerHTML=[
+    {l:'Profile set up',v:state.profile.name?100:0,c:'var(--navy)'},
+    {l:'Achievements logged',v:Math.min(100,state.achievements.length*20),c:'var(--blue)'},
+    {l:'Subjects added',v:Math.min(100,state.subjects.length*25),c:'var(--amber)'},
+    {l:'Skills recorded',v:Math.min(100,allSk.size*12),c:'var(--green)'}
+  ].map(function(b){return '<div class="pw"><div class="pl"><span>'+b.l+'</span><span>'+b.v+'%</span></div><div class="pb"><div class="pf" style="width:'+b.v+'%;background:'+b.c+'"></div></div></div>';}).join('');
+  var next=state.timeline.filter(function(e){return Math.ceil((new Date(e.date)-today)/86400000)>=0;}).sort(function(a,b){return new Date(a.date)-new Date(b.date);})[0];
+  var card=document.getElementById('d-dl-card');
+  if(next){
+    card.style.display='';
+    var diff=Math.ceil((new Date(next.date)-today)/86400000);
+    var diffStr=diff===0?'Today!':diff===1?'Tomorrow':diff+' days away';
+    var col=diff<=7?'var(--red)':diff<=21?'var(--amber)':'var(--green)';
+    document.getElementById('d-dl').innerHTML='<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-size:24px">⏰</span><div style="flex:1"><div style="font-weight:700;font-size:15px">'+esc(next.title)+'</div><div style="font-size:13px;color:var(--muted)">'+new Date(next.date).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})+'</div></div><span style="background:rgba(26,86,196,.1);color:'+col+';padding:5px 14px;font-size:13px;border-radius:99px;font-weight:700;white-space:nowrap">'+diffStr+'</span></div>';
+  }else{card.style.display='none';}
+}
+
+// STATEMENT
+function genStatement(){
+  if(!state.achievements.length){toast('Add some achievements first! ⭐');return;}
+  var purpose=document.getElementById('st-purpose').value;
+  var focus=document.getElementById('st-focus').value.trim();
+  var pmap={apprenticeship:'an apprenticeship',college:'a college or sixth form place',cv:'employment',ucas:'a university course',general:'future opportunities'};
+  var skills=[...new Set(state.achievements.flatMap(function(a){return a.skills;}))];
+  var cats=[...new Set(state.achievements.map(function(a){return a.cat;}))];
+  var phrases=state.achievements.slice(0,5).map(function(a){var sk=a.skills.length?' — showing '+a.skills.slice(0,2).join(' and '):'';return a.title+(a.date?' ('+a.date+')':'')+sk;});
+  var topSk=skills.slice(0,4);
+  var skStr=topSk.length>=2?topSk.slice(0,-1).join(', ')+' and '+topSk[topSk.length-1]:topSk[0]||'a range of transferable skills';
+  var ctx='Through my activities at school and beyond, ';
+  if(cats.includes('sport')&&cats.includes('community'))ctx='Both inside and outside school — from sport to community involvement — ';
+  else if(cats.includes('sport'))ctx='Through my involvement in sport, ';
+  else if(cats.includes('community'))ctx='Through my community involvement, ';
+  else if(cats.includes('work'))ctx='Through my work experience, ';
+  else if(cats.includes('careers'))ctx='Through attending careers events and exploring my options, ';
+  else if(cats.includes('arts'))ctx='Through my creative pursuits, ';
+  var achStr=phrases.length===1?phrases[0]:phrases.slice(0,-1).join('; ')+'; and '+phrases[phrases.length-1];
+  var yr=state.profile.year?' As a '+state.profile.year+' student, ':' ';
+  var focusLine=focus?' I am particularly keen to bring my '+focus+' to this opportunity.':'';
+  var stmt=ctx+'I have built a genuine set of skills and experiences that I believe make me a strong candidate for '+pmap[purpose]+'. My activities have included: '+achStr+'. Across these experiences I have developed '+skStr+'.'+focusLine+yr+'I am motivated, ready to work hard, and committed to making the most of every opportunity that comes my way.';
+  document.getElementById('stmt-out').textContent=stmt;
+  toast('Statement generated! ✨ Make it your own.');
+}
+function copyStmt(){var t=document.getElementById('stmt-out').textContent;if(!t||t.includes('will appear here')){toast('Generate a statement first!');return;}navigator.clipboard.writeText(t).then(function(){toast('Copied! 📋');});}
+
+// DOWNLOAD SUMMARY
+function dlSummary(){
+  var name=state.profile.name||'Student';
+  var year=state.profile.year||'';
+  var stmt=document.getElementById('stmt-out').textContent;
+  var hasStmt=stmt&&!stmt.includes('will appear here');
+  var allSk=[...new Set(state.achievements.flatMap(function(a){return a.skills;}))];
+  var today=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  var subjRows=state.subjects.map(function(s){return '<tr><td>'+esc(s.name)+'</td><td>'+(FEELE[s.feel]||'')+' '+(FEEL[s.feel]||s.feel)+'</td><td>'+(s.target||'—')+'</td></tr>';}).join('');
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;color:#222;line-height:1.6;padding:20px}h1{font-size:22px;color:#0d2a6e;margin-bottom:2px}.sub{color:#666;font-size:13px;margin-bottom:24px}h2{font-size:14px;border-bottom:2px solid #1a56c4;padding-bottom:4px;margin-top:26px;color:#1a56c4}.ach{border:1px solid #dde;border-radius:8px;padding:11px 15px;margin-bottom:9px}.at{font-weight:700;font-size:14px}.am{font-size:11px;color:#888;margin-top:3px}.ad{font-size:13px;margin-top:5px;color:#444}.tag{display:inline-block;background:#eef0ff;color:#1a56c4;padding:2px 9px;border-radius:99px;font-size:11px;margin:2px;font-weight:600}.stmt{background:#f5f7ff;border-left:4px solid #1a56c4;padding:13px 17px;border-radius:0 8px 8px 0;font-style:italic}table{border-collapse:collapse;width:100%;font-size:13px}td,th{padding:7px 10px;border:1px solid #dde;text-align:left}th{background:#f0f4fa}.footer{font-size:11px;color:#aaa;margin-top:36px;text-align:center}</style></head><body>'+
+    '<h1>'+esc(name)+'</h1><div class="sub">'+year+' &middot; Launchpad &mdash; The Kimberley School &middot; '+today+'</div>'+
+    (hasStmt?'<h2>Personal Statement Draft</h2><div class="stmt">'+esc(stmt)+'</div>':'')+
+    '<h2>Achievements &amp; Experiences</h2>'+(state.achievements.length?state.achievements.map(function(a){return '<div class="ach"><div class="at">'+esc(a.title)+'</div><div class="am">'+(CAT[a.cat]||a.cat)+(a.date?' · '+esc(a.date):'')+'</div>'+(a.desc?'<div class="ad">'+esc(a.desc)+'</div>':'')+(a.skills.length?'<div style="margin-top:7px">'+a.skills.map(function(s){return '<span class="tag">'+s+'</span>';}).join('')+'</div>':'')+'</div>';}).join(''):'<p style="color:#888">No achievements logged yet.</p>')+
+    (state.subjects.length?'<h2>Subjects &amp; Targets</h2><table><tr><th>Subject</th><th>Feeling</th><th>Target</th></tr>'+subjRows+'</table>':'')+
+    (allSk.length?'<h2>Skills Demonstrated</h2><div>'+allSk.map(function(s){return '<span class="tag">'+s+'</span>';}).join('')+'</div>':'')+
+    '<div class="footer">Generated by Launchpad &middot; The Kimberley School &middot; '+today+'</div></body></html>';
+  var blob=new Blob([html],{type:'text/html'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='Launchpad-'+name+'.html';a.click();URL.revokeObjectURL(url);
+  toast('Summary downloaded! 📄');
+}
+
+// CONFETTI
+function confetti(){
+  var colors=['#1a56c4','#0d2a6e','#1a9e5c','#d4820a','#5b9cf6','#fff'];
+  for(var i=0;i<18;i++){
+    var el=document.createElement('div');el.className='confetti-piece';
+    el.style.left=Math.random()*100+'vw';
+    el.style.background=colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDelay=(Math.random()*.5)+'s';
+    el.style.transform='rotate('+Math.random()*360+'deg)';
+    document.body.appendChild(el);
+    setTimeout(function(e){return function(){e.remove();};}(el),1800);
+  }
+}
+
+// DOFE
+var DOFE_SECTIONS = {
+  bronze: [
+    {key:'volunteering', label:'Volunteering', icon:'🤝', desc:'Helping others or the community', duration:'3 months'},
+    {key:'physical',     label:'Physical',     icon:'⚽', desc:'Sport, dance or fitness activity', duration:'3 months'},
+    {key:'skill',        label:'Skill',        icon:'🎨', desc:'Developing a practical or creative skill', duration:'3 months'},
+    {key:'expedition',   label:'Expedition',   icon:'🏕️', desc:'A planned 2-day, 1-night expedition', duration:'Training + 2 days'}
+  ],
+  silver: [
+    {key:'volunteering', label:'Volunteering', icon:'🤝', desc:'Helping others or the community', duration:'6 months'},
+    {key:'physical',     label:'Physical',     icon:'⚽', desc:'Sport, dance or fitness activity', duration:'6 months (or 3 if skill is 6)'},
+    {key:'skill',        label:'Skill',        icon:'🎨', desc:'Developing a practical or creative skill', duration:'6 months (or 3 if physical is 6)'},
+    {key:'expedition',   label:'Expedition',   icon:'🏕️', desc:'A planned 3-day, 2-night expedition', duration:'Training + 3 days'}
+  ],
+  gold: [
+    {key:'volunteering', label:'Volunteering', icon:'🤝', desc:'Helping others or the community', duration:'12 months'},
+    {key:'physical',     label:'Physical',     icon:'⚽', desc:'Sport, dance or fitness activity', duration:'6 months'},
+    {key:'skill',        label:'Skill',        icon:'🎨', desc:'Developing a practical or creative skill', duration:'6 months'},
+    {key:'expedition',   label:'Expedition',   icon:'🏕️', desc:'A planned 4-day, 3-night expedition', duration:'Training + 4 days'},
+    {key:'residential',  label:'Residential',  icon:'🏠', desc:'A shared purposeful residential activity away from home', duration:'5 days and 4 nights'}
+  ]
+};
+
+var SECTION_STATUS = {
+  'not-started': {label:'Not started', col:'var(--dim)'},
+  'planning':    {label:'Planning',    col:'var(--amber)'},
+  'inprogress':  {label:'In progress', col:'var(--blue)'},
+  'complete':    {label:'Complete ✓',  col:'var(--green)'}
+};
+
+function saveDofE(){
+  state.dofe.level  = document.getElementById('dofe-level').value;
+  state.dofe.status = document.getElementById('dofe-status').value;
+  var n = document.getElementById('dofe-notes');
+  if(n) state.dofe.notes = n.value;
+  renderDofE();
+  autosave();
+}
+
+function saveSectionStatus(key, val){
+  state.dofe.sections[key] = val;
+  autosave();
+  renderDofE();
+}
+
+function saveSectionDetail(key, val){
+  var sk = key+'_detail';
+  state.dofe.sections[sk] = val;
+  autosave();
+}
+
+function renderDofE(){
+  var level = state.dofe.level || "";
+  var statusEl = document.getElementById("dofe-status");
+  var notesEl  = document.getElementById("dofe-notes");
+  var lvlEl    = document.getElementById("dofe-level");
+  if(lvlEl    && state.dofe.level)  lvlEl.value    = state.dofe.level;
+  if(statusEl && state.dofe.status) statusEl.value = state.dofe.status;
+  if(notesEl  && state.dofe.notes)  notesEl.value  = state.dofe.notes;
+  var container = document.getElementById("dofe-sections");
+  if(!container) return;
+  if(!level){
+    container.innerHTML = "<div class=\"card\"><div class=\"empty\"><div class=\"ei\">&#127956;</div>Choose your award level above to see your progress tracker.</div></div>";
+    return;
+  }
+  var secs = DOFE_SECTIONS[level] || [];
+  var completedCount = secs.filter(function(s){ return state.dofe.sections[s.key] === "complete"; }).length;
+  var pct = Math.round((completedCount / secs.length) * 100);
+  var levelLabels = {bronze:"Bronze &#129353;", silver:"Silver &#129352;", gold:"Gold &#129351;"};
+  var levelLabel = levelLabels[level] || level;
+  var html = "<div class=\"card\">";
+  html += "<div class=\"ct\">&#128200; " + levelLabel + " progress</div>";
+  html += "<div class=\"pw\"><div class=\"pl\"><span>Sections complete</span><span>" + completedCount + " / " + secs.length + "</span></div><div class=\"pb\"><div class=\"pf\" style=\"width:" + pct + "%;background:var(--green)\"></div></div></div>";
+  if(completedCount === secs.length){
+    html += "<div style=\"background:rgba(26,158,92,.1);border:1px solid rgba(26,158,92,.3);border-radius:var(--rs);padding:12px 14px;font-size:14px;font-weight:600;color:var(--green);text-align:center;margin-top:8px\">&#127881; All sections complete &mdash; well done! Log this in your Achievements too.</div>";
+  }
+  html += "</div>";
+  secs.forEach(function(s){
+    var secStatus = state.dofe.sections[s.key] || "not-started";
+    var secDetail = state.dofe.sections[s.key+"_detail"] || "";
+    var sc = SECTION_STATUS[secStatus] || SECTION_STATUS["not-started"];
+    var statusOpts = Object.keys(SECTION_STATUS).map(function(v){
+      return "<option value=\"" + v + "\"" + (secStatus===v ? " selected" : "") + ">" + SECTION_STATUS[v].label + "</option>";
+    }).join("");
+    html += "<div class=\"card\" style=\"border-left:4px solid " + sc.col + ";margin-bottom:12px\">";
+    html += "<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:10px\">";
+    html += "<span style=\"font-size:22px\">" + s.icon + "</span>";
+    html += "<div style=\"flex:1\"><div style=\"font-weight:700;font-size:14px\">" + s.label + "</div>";
+    html += "<div style=\"font-size:12px;color:var(--muted)\">" + s.desc + "</div></div>";
+    html += "<span style=\"font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(0,0,0,.05);color:" + sc.col + "\">" + sc.label + "</span>";
+    html += "</div>";
+    html += "<div class=\"fr\" style=\"margin-bottom:8px\">";
+    html += "<div><label>Status</label><select onchange=\"saveSectionStatus('"+s.key+"'\\,this.value)\" style=\"font-size:13px;padding:7px 10px;color:" + sc.col + "\">" + statusOpts + "</select></div>";
+    html += "<div><label>Duration required</label><div style=\"font-size:13px;padding:9px 0;color:var(--muted)\">" + s.duration + "</div></div>";
+    html += "</div>";
+    html += "<div><label>What I did / am doing</label>";
+    html += "<textarea onchange=\"saveSectionDetail('"+s.key+"'\\,this.value)\" placeholder=\"e.g. Playing for school hockey team, training twice a week...\" style=\"min-height:64px;font-size:13px\">" + esc(secDetail) + "</textarea></div>";
+    html += "</div>";
+  });
+  container.innerHTML = html;
+}
+
+// SAVE / LOAD
+function saveFile(){
+  var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');
+  a.href=url;a.download='Launchpad-'+(state.profile.name||'data')+'.json';a.click();URL.revokeObjectURL(url);
+  toast('Saved! Keep that file somewhere safe 💾');
+}
+function loadFile(input,isWelcome){
+  var file=input.files[0];if(!file)return;
+  var r=new FileReader();
+  r.onload=function(e){
+    try{
+      state=JSON.parse(e.target.result);
+      if(!state.subjects)state.subjects=[];
+      if(!state.timeline)state.timeline=[];
+      if(!state.moments)state.moments=[];
+      if(!state.goals)state.goals='';
+      if(!state.dofe)state.dofe={level:'',status:'planning',sections:{},notes:''};
+      if(isWelcome)launch();
+      else{updateDash();renderMoments();renderAch();renderSubj();renderTimeline();var g=document.getElementById('goals-text');if(g)g.value=state.goals;nav('dashboard');}
+      toast('Welcome back, '+(state.profile.name||'there')+' 👋');
+    }catch(err){toast('Could not read that file.');}
+  };
+  r.readAsText(file);
+}
+function autosave(){try{localStorage.setItem('lp_save',JSON.stringify(state));}catch(e){}}
+function checkAutosave(){
+  try{
+    var d=localStorage.getItem('lp_save');if(!d)return;
+    var p=JSON.parse(d);if(!p.profile||!p.profile.name)return;
+    var b=document.createElement('div');
+    b.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#0d2a6e;color:white;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;z-index:300;font-size:13px;flex-wrap:wrap;gap:8px;';
+    b.innerHTML='<span>Found a previous session for <strong>'+esc(p.profile.name)+'</strong></span><div style="display:flex;gap:8px"><button onclick="resumeSession()" style="background:white;color:#0d2a6e;border:none;border-radius:6px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:13px;-webkit-appearance:none">Resume</button><button onclick="this.parentElement.parentElement.remove()" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.25);border-radius:6px;padding:8px 14px;cursor:pointer;font-size:13px;-webkit-appearance:none">Start fresh</button></div>';
+    document.body.appendChild(b);window._as=p;
+  }catch(e){}
+}
+function resumeSession(){
+  state=window._as;
+  if(!state.subjects)state.subjects=[];if(!state.timeline)state.timeline=[];if(!state.moments)state.moments=[];if(!state.goals)state.goals='';if(!state.dofe)state.dofe={level:'',status:'planning',sections:{},notes:''};
+  var old=document.querySelector('[style*="position:fixed;bottom:0"]');if(old)old.remove();
+  launch();
+}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2800);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// MOBILE NAV SCROLL HINT
+function initMobNavHint(){
+  var inner = document.getElementById('mob-inner');
+  var fade  = document.getElementById('mob-fade');
+  var chev  = document.getElementById('mob-chevron');
+  if(!inner || !fade || !chev) return;
+  function updateHint(){
+    var atEnd = inner.scrollLeft + inner.clientWidth >= inner.scrollWidth - 8;
+    var v = atEnd ? '0' : '1';
+    fade.style.opacity = v;
+    chev.style.opacity = v;
+  }
+  inner.addEventListener('scroll', updateHint, {passive:true});
+  updateHint();
+  var hinted = false;
+  try { hinted = !!localStorage.getItem('lp_nav_hinted'); } catch(e){}
+  if(!hinted){
+    setTimeout(function(){
+      inner.scrollTo({left:44, behavior:'smooth'});
+      setTimeout(function(){
+        inner.scrollTo({left:0, behavior:'smooth'});
+        try { localStorage.setItem('lp_nav_hinted','1'); } catch(e){}
+      }, 650);
+    }, 1000);
+  }
+}
+window.addEventListener('DOMContentLoaded', function(){
+  initMobNavHint();
+});
+</script>
+</body>
+</html>
